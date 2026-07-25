@@ -1,0 +1,11 @@
+MISPFuse 2.1.0
+
+- Uses MISPFuse as the visible app name.
+- Adds the complete Splunk app icon and logo set.
+- Replaces PyMISP with a small MISP REST client.
+- Locks all runtime dependencies by version and SHA-256 hash.
+- Rejects native binaries during the release check.
+- Uses template defaults when alert-action override fields are left blank.
+- Requires an explicit MISP type in every mapping.
+- Tests MISP account settings before create or edit.
+- Includes quick-test SPL for every bundled template and for the alert action.

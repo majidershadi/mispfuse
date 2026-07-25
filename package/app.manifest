@@ -1,0 +1,60 @@
+{
+    "schemaVersion": "2.0.0",
+    "info": {
+        "title": "MISPFuse",
+        "id": {
+            "group": null,
+            "name": "mispfuse",
+            "version": "2.1.0"
+        },
+        "author": [
+            {
+                "name": "Majid Ershadi",
+                "email": "majjid.khayatershadii@gmail.com",
+                "company": null
+            }
+        ],
+        "releaseDate": "2026-07-25",
+        "description": "Push selected Splunk search results to MISP as events and attributes using server-validated mapping templates, multiple MISP connections, a custom search command, and a scheduled alert action.",
+        "classification": {
+            "intendedAudience": "Security Analysts",
+            "categories": [
+                "Security, Fraud & Compliance"
+            ],
+            "developmentStatus": "Production/Stable"
+        },
+        "commonInformationModels": null,
+        "license": {
+            "name": "Apache-2.0",
+            "text": "LICENSES/Apache-2.0.txt",
+            "uri": null
+        },
+        "privacyPolicy": {
+            "name": "MISPFuse privacy statement",
+            "text": "README/PRIVACY.txt",
+            "uri": null
+        },
+        "releaseNotes": {
+            "name": "MISPFuse 2.1.0 release notes",
+            "text": "README/RELEASE_NOTES.txt",
+            "uri": null
+        }
+    },
+    "dependencies": null,
+    "tasks": null,
+    "inputGroups": null,
+    "incompatibleApps": null,
+    "platformRequirements": {
+        "splunk": {
+            "Enterprise": ">=10.2"
+        }
+    },
+    "supportedDeployments": [
+        "_standalone",
+        "_distributed",
+        "_search_head_clustering"
+    ],
+    "targetWorkloads": [
+        "_search_heads"
+    ]
+}

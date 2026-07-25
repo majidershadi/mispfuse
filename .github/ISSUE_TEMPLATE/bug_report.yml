@@ -1,0 +1,51 @@
+name: Bug report
+description: Report a reproducible MISPFuse defect
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Remove API keys, session keys, private URLs, and event data before submitting.
+  - type: input
+    id: version
+    attributes:
+      label: MISPFuse version
+      placeholder: 2.1.0
+    validations:
+      required: true
+  - type: input
+    id: splunk
+    attributes:
+      label: Splunk version and deployment
+      placeholder: Splunk Enterprise 10.2, standalone search head
+    validations:
+      required: true
+  - type: input
+    id: misp
+    attributes:
+      label: MISP version
+      placeholder: 2.5.x
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs
+      render: shell

@@ -1,0 +1,16 @@
+# Python build artifacts
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# UCC/AppInspect build output
+output/
+*.tar.gz
+
+# Local tooling
+.pytest_cache/
+.mypy_cache/
+.coverage

@@ -1,0 +1,32 @@
+<dashboard version="1.1" theme="light">
+  <label>MISPFuse Overview</label>
+  <description>Push Splunk results to MISP. Configure instances, then use the alert action or the mispfusepush command.</description>
+  <row>
+    <panel>
+      <html>
+        <div style="padding:12px 16px">
+          <h2>Getting started</h2>
+          <ol>
+            <li>Open <b>Configuration</b> and add one or more MISP instances (URL + API key).</li>
+            <li>Push interactively: <code>... | mispfusepush account=&lt;name&gt; template=network_ioc</code></li>
+            <li>Or add the alert action <b>MISPFuse - Push to MISP</b> to a saved search.</li>
+          </ol>
+          <p>Templates live in <code>mispfuse_templates.conf</code> and are validated against your MISP server's <code>describeTypes</code>.</p>
+        </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Recent MISPFuse activity (internal logs)</title>
+      <table>
+        <search>
+          <query>index=_internal source=*mispfuse* (event OR error OR failed OR success) | table _time log_level message | head 100</query>
+          <earliest>-24h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">20</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,4 @@
+# Build and test environment. These packages are not shipped in the Splunk app.
+-r requirements-test.txt
+splunk-add-on-ucc-framework==6.5.3
+splunk-appinspect==4.2.1
