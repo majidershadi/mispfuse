@@ -1,0 +1,5 @@
+# Packages removed from lib/ after install (UCC runs this after pip).
+# Splunk ships its own copies; bundling duplicates is what left the old
+# build with three urllib3s and two pymisps. Keep this list conservative:
+# only remove what Splunk provides AND pymisp can import from the platform.
+setuptools

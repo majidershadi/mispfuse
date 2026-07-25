@@ -1,0 +1,6 @@
+# Installed by ucc-gen into the add-on's lib/ folder at build time.
+# Target runtime: Splunk 10.2+ on Python 3.13 (latest PyMISP requires >=3.10).
+pymisp
+solnlib
+splunktaucclib
+splunk-sdk

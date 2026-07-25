@@ -1,0 +1,52 @@
+{
+    "schemaVersion": "2.0.0",
+    "info": {
+        "title": "MISPFuse Add-on for Splunk",
+        "id": {
+            "group": null,
+            "name": "mispfuse",
+            "version": "2.0.0"
+        },
+        "author": [
+            {
+                "name": "MISPFuse",
+                "email": null,
+                "company": null
+            }
+        ],
+        "releaseDate": null,
+        "description": "Push Splunk search results to MISP as events/attributes using configurable, server-validated templates. Ships a custom search command (mispfusepush) and an alert action.",
+        "classification": {
+            "intendedAudience": "IT Professionals",
+            "categories": ["Security, Fraud & Compliance"],
+            "developmentStatus": "Production/Stable"
+        },
+        "commonInformationModels": null,
+        "license": {
+            "name": null,
+            "text": "LICENSES/",
+            "uri": null
+        },
+        "privacyPolicy": {
+            "name": null,
+            "text": null,
+            "uri": null
+        },
+        "releaseNotes": {
+            "name": null,
+            "text": "./README.md",
+            "uri": null
+        }
+    },
+    "dependencies": null,
+    "tasks": null,
+    "inputGroups": null,
+    "incompatibleApps": null,
+    "platformRequirements": {
+        "splunk": {
+            "Enterprise": ">=10.2"
+        }
+    },
+    "supportedDeployments": ["_standalone", "_distributed", "_search_head_clustering"],
+    "targetWorkloads": ["_search_heads"]
+}

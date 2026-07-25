@@ -1,0 +1,257 @@
+{
+    "meta": {
+        "name": "mispfuse",
+        "restRoot": "mispfuse",
+        "version": "2.0.0",
+        "displayName": "MISPFuse Add-on for Splunk",
+        "schemaVersion": "0.0.9",
+        "checkForUpdates": false
+    },
+    "pages": {
+        "configuration": {
+            "title": "Configuration",
+            "description": "Configure MISP instances, proxy and logging for MISPFuse.",
+            "tabs": [
+                {
+                    "name": "account",
+                    "title": "MISP Instances",
+                    "table": {
+                        "actions": ["edit", "delete", "clone"],
+                        "header": [
+                            {"label": "Name", "field": "name"},
+                            {"label": "MISP URL", "field": "misp_url"},
+                            {"label": "Verify TLS", "field": "verify_ssl"}
+                        ]
+                    },
+                    "entity": [
+                        {
+                            "type": "text",
+                            "label": "Name",
+                            "field": "name",
+                            "help": "A unique name for this MISP instance. Referenced by the alert action and the mispfusepush command via account=<name>.",
+                            "required": true,
+                            "validators": [
+                                {
+                                    "type": "regex",
+                                    "errorMsg": "Name must start with a letter and contain only letters, numbers and underscores.",
+                                    "pattern": "^[a-zA-Z]\\w*$"
+                                },
+                                {
+                                    "type": "string",
+                                    "errorMsg": "Length of Name should be between 1 and 50 characters.",
+                                    "minLength": 1,
+                                    "maxLength": 50
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "label": "MISP URL",
+                            "field": "misp_url",
+                            "help": "Base URL of the MISP instance, e.g. https://misp.example.org",
+                            "required": true,
+                            "validators": [
+                                {
+                                    "type": "regex",
+                                    "errorMsg": "Enter a valid https URL, e.g. https://misp.example.org",
+                                    "pattern": "^https?://[^\\s/$.?#].[^\\s]*$"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "label": "API Key (Authkey)",
+                            "field": "misp_key",
+                            "help": "MISP automation Authkey for this instance. Stored encrypted in storage/passwords.",
+                            "required": true,
+                            "encrypted": true,
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "errorMsg": "Length of the API key should be between 1 and 200 characters.",
+                                    "minLength": 1,
+                                    "maxLength": 200
+                                }
+                            ]
+                        },
+                        {
+                            "type": "checkbox",
+                            "label": "Verify TLS certificate",
+                            "field": "verify_ssl",
+                            "help": "Recommended. Disable only for lab instances with self-signed certificates.",
+                            "defaultValue": 1
+                        }
+                    ]
+                },
+                {
+                    "type": "proxyTab",
+                    "proxy_type": true,
+                    "username": true,
+                    "password": true,
+                    "dns_resolution": false
+                },
+                {
+                    "type": "loggingTab"
+                }
+            ]
+        }
+    },
+    "alerts": [
+        {
+            "name": "mispfuse_push",
+            "label": "MISPFuse - Push to MISP",
+            "description": "Push the triggering search results to a MISP instance as events/attributes using a MISPFuse template.",
+            "iconFileName": "alerticon.png",
+            "customScript": "mispfuse_push_logic.py",
+            "entity": [
+                {
+                    "type": "singleSelectSplunkSearch",
+                    "label": "MISP instance",
+                    "field": "account",
+                    "search": "| rest /servicesNS/nobody/mispfuse/mispfuse_account splunk_server=local | dedup title | table title",
+                    "valueField": "title",
+                    "labelField": "title",
+                    "help": "Select which configured MISP instance to push to.",
+                    "required": true
+                },
+                {
+                    "type": "singleSelect",
+                    "label": "Template",
+                    "field": "template",
+                    "options": {
+                        "items": [
+                            {"value": "network_ioc", "label": "Network IOCs"},
+                            {"value": "file_hashes", "label": "File hashes"},
+                            {"value": "email_phishing", "label": "Email / phishing"},
+                            {"value": "passthrough", "label": "Passthrough (auto types)"}
+                        ]
+                    },
+                    "defaultValue": "network_ioc",
+                    "help": "Mapping template defined in mispfuse_templates.conf. Add stanzas there to create your own.",
+                    "required": true
+                },
+                {
+                    "type": "singleSelect",
+                    "label": "Grouping",
+                    "field": "grouping",
+                    "options": {
+                        "items": [
+                            {"value": "single_event", "label": "One event, many attributes"},
+                            {"value": "per_row", "label": "One event per row"},
+                            {"value": "by_field", "label": "Group by field value"}
+                        ]
+                    },
+                    "defaultValue": "single_event",
+                    "help": "Overrides the template's grouping. 'by_field' uses the Group field below.",
+                    "required": false
+                },
+                {
+                    "type": "text",
+                    "label": "Group field",
+                    "field": "group_field",
+                    "help": "Field name whose value groups rows into events (only used when Grouping = Group by field value).",
+                    "required": false
+                },
+                {
+                    "type": "text",
+                    "label": "Event info",
+                    "field": "event_info",
+                    "defaultValue": "IOCs from Splunk (MISPFuse)",
+                    "help": "Event title. Use $fieldname$ to substitute a value from the first row of a group.",
+                    "required": false
+                },
+                {
+                    "type": "singleSelect",
+                    "label": "Distribution",
+                    "field": "distribution",
+                    "options": {
+                        "items": [
+                            {"value": "0", "label": "0 - Your organisation only"},
+                            {"value": "1", "label": "1 - This community only"},
+                            {"value": "2", "label": "2 - Connected communities"},
+                            {"value": "3", "label": "3 - All communities"}
+                        ]
+                    },
+                    "defaultValue": "0",
+                    "required": false
+                },
+                {
+                    "type": "singleSelect",
+                    "label": "Threat level",
+                    "field": "threat_level_id",
+                    "options": {
+                        "items": [
+                            {"value": "1", "label": "1 - High"},
+                            {"value": "2", "label": "2 - Medium"},
+                            {"value": "3", "label": "3 - Low"},
+                            {"value": "4", "label": "4 - Undefined"}
+                        ]
+                    },
+                    "defaultValue": "4",
+                    "required": false
+                },
+                {
+                    "type": "singleSelect",
+                    "label": "Analysis",
+                    "field": "analysis",
+                    "options": {
+                        "items": [
+                            {"value": "0", "label": "0 - Initial"},
+                            {"value": "1", "label": "1 - Ongoing"},
+                            {"value": "2", "label": "2 - Completed"}
+                        ]
+                    },
+                    "defaultValue": "0",
+                    "required": false
+                },
+                {
+                    "type": "text",
+                    "label": "Tags",
+                    "field": "tags",
+                    "help": "Comma-separated tags to add to each event, e.g. tlp:amber,source:splunk",
+                    "required": false
+                },
+                {
+                    "type": "checkbox",
+                    "label": "Set to_ids on attributes",
+                    "field": "to_ids",
+                    "defaultValue": 0,
+                    "help": "Overrides the template default. When checked, attributes are marked actionable.",
+                    "required": false
+                },
+                {
+                    "type": "checkbox",
+                    "label": "Publish event(s)",
+                    "field": "publish",
+                    "defaultValue": 0,
+                    "help": "Publish immediately after creation. Leave off to review in MISP first.",
+                    "required": false
+                }
+            ]
+        }
+    ],
+    "customSearchCommand": [
+        {
+            "commandName": "mispfusepush",
+            "fileName": "mispfuse_command_logic.py",
+            "commandType": "dataset processing",
+            "requiredSearchAssistant": true,
+            "usage": "public",
+            "description": "Push the incoming search results to a configured MISP instance as events/attributes using a MISPFuse template.",
+            "syntax": "mispfusepush account=<string> template=<string> grouping=<string> group_field=<field> event_info=<string> distribution=<int> threat_level_id=<int> analysis=<int> tags=<string> to_ids=<bool> publish=<bool>",
+            "arguments": [
+                {"name": "account", "required": true},
+                {"name": "template", "required": false, "defaultValue": "network_ioc"},
+                {"name": "grouping", "required": false},
+                {"name": "group_field", "required": false, "validate": {"type": "Fieldname"}},
+                {"name": "event_info", "required": false},
+                {"name": "distribution", "required": false, "validate": {"type": "Integer", "minimum": 0, "maximum": 4}},
+                {"name": "threat_level_id", "required": false, "validate": {"type": "Integer", "minimum": 1, "maximum": 4}},
+                {"name": "analysis", "required": false, "validate": {"type": "Integer", "minimum": 0, "maximum": 2}},
+                {"name": "tags", "required": false},
+                {"name": "to_ids", "required": false, "validate": {"type": "Boolean"}},
+                {"name": "publish", "required": false, "validate": {"type": "Boolean"}}
+            ]
+        }
+    ]
+}

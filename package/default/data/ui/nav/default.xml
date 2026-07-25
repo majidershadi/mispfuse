@@ -1,0 +1,5 @@
+<nav search_view="search" color="#65A637">
+  <view name="mispfuse_overview" default="true" />
+  <view name="configuration" label="Configuration" />
+  <view name="search" />
+</nav>
