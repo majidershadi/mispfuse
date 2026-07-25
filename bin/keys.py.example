@@ -1,3 +1,0 @@
-misp_url = "https://misp.example.org"
-misp_key = "REPLACE_WITH_A_DEDICATED_MISP_AUTOMATION_KEY"
-misp_verifycert = True
