@@ -2,11 +2,12 @@
     "meta": {
         "name": "mispfuse",
         "restRoot": "mispfuse",
-        "version": "2.1.0",
+        "version": "2.2.0",
         "displayName": "MISPFuse",
         "schemaVersion": "0.0.10",
         "checkForUpdates": true,
         "supportedPythonVersion": [
+            "3.9",
             "3.13"
         ],
         "hideUCCVersion": true,

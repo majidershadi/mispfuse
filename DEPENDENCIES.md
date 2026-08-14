@@ -2,8 +2,10 @@
 
 `package/lib/requirements.txt` contains the complete runtime dependency set.
 Every package has an exact version and SHA-256 hash. Pip is instructed to use
-wheels only, and the post-build check rejects native binaries in the generated
-app.
+wheels except for `splunk-sdk` 2.1.1, the newest release compatible with Python
+3.9 and 3.13. That SDK release is published only as a pure-Python source
+distribution, so it has a package-specific source exception. The post-build
+check rejects native binaries in the generated app regardless of origin.
 
 PyMISP is not bundled. MISPFuse uses four MISP API operations—server version,
 current user, `describeTypes`, and event creation—through a small urllib3

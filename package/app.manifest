@@ -5,7 +5,7 @@
         "id": {
             "group": null,
             "name": "mispfuse",
-            "version": "2.1.0"
+            "version": "2.2.0"
         },
         "author": [
             {
@@ -14,7 +14,7 @@
                 "company": null
             }
         ],
-        "releaseDate": "2026-07-25",
+        "releaseDate": "2026-08-14",
         "description": "Push selected Splunk search results to MISP as events and attributes using server-validated mapping templates, multiple MISP connections, a custom search command, and a scheduled alert action.",
         "classification": {
             "intendedAudience": "Security Analysts",
@@ -35,7 +35,7 @@
             "uri": null
         },
         "releaseNotes": {
-            "name": "MISPFuse 2.1.0 release notes",
+            "name": "MISPFuse 2.2.0 release notes",
             "text": "README/RELEASE_NOTES.txt",
             "uri": null
         }
@@ -46,7 +46,7 @@
     "incompatibleApps": null,
     "platformRequirements": {
         "splunk": {
-            "Enterprise": ">=10.2"
+            "Enterprise": ">=10.0"
         }
     },
     "supportedDeployments": [

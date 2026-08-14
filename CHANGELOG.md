@@ -1,5 +1,32 @@
 # Changelog
 
+## 2.2.0 — Backward-compatible Splunkbase release
+
+### Changed
+
+- Expanded the declared Splunk Enterprise range from 10.2+ to 10.0+ after
+  adding real Python 3.9 compatibility.
+- Declared both Python 3.9 and 3.13 for commands, alert actions, and REST
+  handlers while retaining `python.version = python3` for Splunk 10.0/10.1.
+- Replaced Python-3.13-only `splunk-sdk` 3.0.0 with compatible version 2.1.1.
+- Updated the local release gate from Splunk AppInspect 4.2.1 to 4.3.0.
+
+### Added
+
+- Unit and syntax checks for the Python 3.9 compatibility boundary.
+- Release verification for both modern `python.required` and legacy
+  `python.version` declarations.
+- A separate v2.2.0 release record; the v2.1.0 tag remains unchanged as the
+  Splunk 10.2/Python 3.13 engineering milestone.
+
+### Fixed
+
+- Splunkbase SLIM rejected the 2.1.0 manifest because `>=10.2` did not
+  intersect the validator's accepted Enterprise versions.
+- Merely lowering the manifest requirement would have made a false runtime
+  claim; 2.2.0 fixes the dependency and runtime compatibility before changing
+  the manifest to `>=10.0`.
+
 ## 2.1.0 — Hardened release candidate
 
 ### Added

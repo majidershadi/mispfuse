@@ -9,6 +9,7 @@ venv/
 # UCC/AppInspect build output
 output/
 *.tar.gz
+*-appinspect-*.json
 
 # Local tooling
 .pytest_cache/

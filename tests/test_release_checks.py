@@ -39,7 +39,7 @@ class ReleaseChecksTest(unittest.TestCase):
             build = str(int(time.time()))
             (default / "app.conf").write_text(
                 "[launcher]\n"
-                "version = 2.1.0\n"
+                "version = 2.2.0\n"
                 "\n"
                 "[install]\n"
                 f"build = {build}\n"
@@ -63,10 +63,10 @@ class ReleaseChecksTest(unittest.TestCase):
             default.mkdir()
             (default / "app.conf").write_text(
                 "[launcher]\n"
-                "version = 2.1.0\n"
+                "version = 2.2.0\n"
                 "\n"
                 "[install]\n"
-                "build = release-2100\n"
+                "build = release-2200\n"
                 "\n"
                 "[package]\n"
                 "id = mispfuse\n"
@@ -94,6 +94,36 @@ class ReleaseChecksTest(unittest.TestCase):
         meta = config["meta"]
         self.assertIs(meta.get("hideUCCVersion"), True)
         self.assertIs(meta.get("showFooter"), False)
+
+    def test_declared_python_versions_are_dual_runtime(self):
+        import json
+
+        config = json.loads((ROOT / "globalConfig.json").read_text(encoding="utf-8"))
+        self.assertEqual(config["meta"]["supportedPythonVersion"], ["3.9", "3.13"])
+
+    def test_manifest_targets_smallest_valid_splunk_range(self):
+        import json
+
+        manifest = json.loads(
+            (ROOT / "package" / "app.manifest").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            manifest["platformRequirements"]["splunk"]["Enterprise"],
+            ">=10.0",
+        )
+
+    def test_package_source_parses_as_python39(self):
+        import ast
+
+        paths = [ROOT / "post_build.py"]
+        paths.extend((ROOT / "package" / "bin").rglob("*.py"))
+        for path in paths:
+            with self.subTest(path=path.relative_to(ROOT)):
+                ast.parse(
+                    path.read_text(encoding="utf-8"),
+                    filename=str(path),
+                    feature_version=(3, 9),
+                )
 
     @staticmethod
     def _read_exact_versions(path: Path) -> dict[str, str]:

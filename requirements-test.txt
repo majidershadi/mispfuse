@@ -1,9 +1,11 @@
 # Runtime packages imported by the unit tests.
 # Keep these exact versions synchronized with package/lib/requirements.txt.
 defusedxml==0.7.1
+deprecation==2.1.0
+packaging==26.3
 PySocks==1.7.1
 sortedcontainers==2.4.0
 solnlib==7.0.0
-splunk-sdk==3.0.0
+splunk-sdk==2.1.1
 splunktaucclib==8.2.0
 urllib3==1.26.20

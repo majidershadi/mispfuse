@@ -10,7 +10,8 @@ import re
 import sys
 from collections.abc import Callable
 
-REQUIRED_VERSION = "3.13"
+REQUIRED_VERSIONS = {"3.9", "3.13"}
+LEGACY_PYTHON_VERSION = "python3"
 
 
 def _load(path: str) -> configparser.RawConfigParser:
@@ -41,15 +42,27 @@ def _check(
 
     for section in selected:
         configured = parser.get(section, "python.required", fallback="")
-        if REQUIRED_VERSION not in _versions(configured):
+        configured_versions = _versions(configured)
+        if configured_versions != REQUIRED_VERSIONS:
             errors.append(
                 f"{path} [{section}] has python.required={configured!r}; "
-                f"expected {REQUIRED_VERSION}"
+                "expected exactly 3.9, 3.13"
             )
         else:
             print(
-                f"  verified python.required includes {REQUIRED_VERSION} "
+                "  verified python.required includes 3.9 and 3.13 "
                 f"in {os.path.basename(path)} [{section}]"
+            )
+        legacy = parser.get(section, "python.version", fallback="")
+        if legacy != LEGACY_PYTHON_VERSION:
+            errors.append(
+                f"{path} [{section}] has python.version={legacy!r}; "
+                "expected python3 for Splunk 10.0/10.1 compatibility"
+            )
+        else:
+            print(
+                "  verified python.version=python3 in "
+                f"{os.path.basename(path)} [{section}]"
             )
     return errors
 
@@ -176,6 +189,8 @@ def _check_locked_dependencies(source_root: str) -> list[str]:
     joined = "".join(lines)
     for name in (
         "defusedxml",
+        "deprecation",
+        "packaging",
         "PySocks",
         "sortedcontainers",
         "solnlib",
@@ -198,7 +213,7 @@ def _check_locked_dependencies(source_root: str) -> list[str]:
 def _check_identity(source_root: str, out_dir: str) -> list[str]:
     expected_id = "mispfuse"
     expected_label = "MISPFuse"
-    expected_version = "2.1.0"
+    expected_version = "2.2.0"
     errors: list[str] = []
 
     app_conf = os.path.join(out_dir, "default", "app.conf")
@@ -208,7 +223,7 @@ def _check_identity(source_root: str, out_dir: str) -> list[str]:
     if parser.get("ui", "label", fallback="") != expected_label:
         errors.append("generated app.conf UI label is not MISPFuse")
     if parser.get("launcher", "version", fallback="") != expected_version:
-        errors.append("generated app.conf launcher version is not 2.1.0")
+        errors.append("generated app.conf launcher version is not 2.2.0")
     generated_build = parser.get("install", "build", fallback="").strip()
     if not generated_build.isdigit() or int(generated_build) <= 0:
         errors.append(
@@ -226,9 +241,25 @@ def _check_identity(source_root: str, out_dir: str) -> list[str]:
     if meta.get("displayName") != expected_label:
         errors.append("globalConfig displayName is not MISPFuse")
     if meta.get("version") != expected_version:
-        errors.append("globalConfig version is not 2.1.0")
+        errors.append("globalConfig version is not 2.2.0")
     if meta.get("checkForUpdates") is not True:
         errors.append("globalConfig does not enable Splunkbase update checks")
+
+    manifest_path = os.path.join(source_root, "package", "app.manifest")
+    with open(manifest_path, encoding="utf-8") as handle:
+        manifest = json.load(handle)
+    manifest_version = (
+        manifest.get("info", {}).get("id", {}).get("version")
+    )
+    if manifest_version != expected_version:
+        errors.append("app.manifest version is not 2.2.0")
+    enterprise = (
+        manifest.get("platformRequirements", {})
+        .get("splunk", {})
+        .get("Enterprise")
+    )
+    if enterprise != ">=10.0":
+        errors.append("app.manifest Splunk Enterprise requirement is not >=10.0")
 
     if not errors:
         print(
@@ -274,8 +305,9 @@ def main(out_dir: str) -> int:
         )
         return 1
 
-    print("Release checks passed: Python 3.13, custom validator, identity, "
-          "locked dependencies, no compiled Python, and no native binaries.")
+    print("Release checks passed: Python 3.9/3.13 declarations, legacy "
+          "python3 fallback, custom validator, identity, locked dependencies, "
+          "no compiled Python, and no native binaries.")
     return 0
 
 

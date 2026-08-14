@@ -90,3 +90,16 @@ Only security-sensitive material should be removed from the public snapshots:
 - copied virtual environments.
 
 Functional improvements belong in later releases.
+
+## Stage 4: make the hardened release backward compatible
+
+Version 2.1.0 intentionally used Splunk SDK 3.0.0 and Python 3.13, which made
+Splunk 10.2 the true minimum. Splunkbase's SLIM matrix rejected the corresponding
+`>=10.2` manifest range. Lowering only the manifest would have created a false
+compatibility claim.
+
+Version 2.2.0 instead changes the runtime boundary first. It uses the newest
+pre-3.0 Splunk SDK, tests the application on Python 3.9 and 3.13, keeps the
+legacy `python.version = python3` selector for Splunk 10.0/10.1, and declares
+`python.required = 3.9, 3.13` for Splunk 10.2+. Only after those changes does
+the manifest move to Splunk Enterprise 10.0 or later.

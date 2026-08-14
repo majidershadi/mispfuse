@@ -1,11 +1,12 @@
-MISPFuse 2.1.0
+MISPFuse 2.2.0
 
-- Uses MISPFuse as the visible app name.
-- Adds the complete Splunk app icon and logo set.
-- Replaces PyMISP with a small MISP REST client.
-- Locks all runtime dependencies by version and SHA-256 hash.
-- Rejects native binaries during the release check.
-- Uses template defaults when alert-action override fields are left blank.
-- Requires an explicit MISP type in every mapping.
-- Tests MISP account settings before create or edit.
-- Includes quick-test SPL for every bundled template and for the alert action.
+- Adds supported Python 3.9 and 3.13 runtime declarations.
+- Keeps python.version=python3 for Splunk 10.0 and 10.1 while using
+  python.required=3.9,3.13 on Splunk 10.2 and later.
+- Expands the truthful Splunk Enterprise compatibility range to 10.0 or later.
+- Replaces the Python-3.13-only Splunk SDK 3.0.0 with the latest compatible
+  pre-3.0 SDK, version 2.1.1.
+- Updates the local AppInspect release gate to version 4.3.0.
+- Adds Python 3.9 syntax and dual-runtime release checks.
+- Preserves the secure MISP client, encrypted credentials, templates, SPL
+  command, alert action, and hardened packaging introduced in 2.1.0.

@@ -5,7 +5,7 @@
 - Type: App
 - Title: MISPFuse
 - Package ID: `mispfuse`
-- Version: 2.1.0
+- Version: 2.2.0
 - License: Apache-2.0
 - Suggested category: Threat Intelligence, or Security, Fraud & Compliance
 
@@ -50,15 +50,17 @@ endorsed by Splunk or the MISP Project.
 
 ## Release notes
 
-- Changed the visible product name to MISPFuse.
-- Added the complete Splunk icon and logo set.
-- Replaced PyMISP with a small MISP REST client.
-- Locked the runtime dependency set by version and SHA-256 hash.
-- Added a release check that rejects native binaries.
-- Corrected alert-action inheritance so blank values use template defaults.
-- Required an explicit MISP type in every mapping.
-- Kept save-time connection validation for MISP accounts.
-- Added copy-and-run SPL examples for all four templates.
+- Fixed the Splunkbase SLIM version-range failure without making an unsupported
+  manifest-only compatibility claim.
+- Added Python 3.9 and 3.13 runtime support.
+- Added the legacy Python selector required by Splunk 10.0 and 10.1 while
+  retaining the modern selector used by Splunk 10.2 and later.
+- Replaced Python-3.13-only Splunk SDK 3.0.0 with compatible SDK 2.1.1.
+- Updated the local AppInspect release gate to 4.3.0.
+- Added dual-runtime, Python 3.9 syntax, identity, dependency, bytecode, and
+  native-binary release checks.
+- Preserved encrypted credentials, save-time MISP validation, the direct MISP
+  client, templates, SPL command, alert action, and hardened packaging.
 
 ## Privacy
 
