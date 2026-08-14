@@ -5,7 +5,7 @@
 - Type: App
 - Title: MISPFuse
 - Package ID: `mispfuse`
-- Version: 2.2.2
+- Version: 2.2.3
 - License: Apache-2.0
 - Suggested category: Threat Intelligence, or Security, Fraud & Compliance
 
@@ -50,13 +50,12 @@ endorsed by Splunk or the MISP Project.
 
 ## Release notes
 
-- Uses the full semantic-version range `>=9.3.0` identified by Splunkbase's
-  online SLIM validator as an accepted 9.x compatibility boundary.
-- Keeps the explicit `python.version = python3.9` selector for Splunk 9.3
-  through 10.1.
+- Uses the full semantic-version range `>=9.0.0` required by Splunkbase's
+  online SLIM validator.
+- Supports the Python 3.7 runtime used by early Splunk 9.x releases and keeps
+  `python.version = python3` for Splunk 9.0 through 10.1.
 - Retained Python 3.9 and 3.13 declarations for Splunk 10.2 and later.
-- Added generated-config regression checks for commands, alert actions, and
-  REST handlers.
+- Added Python 3.7 source, dependency, and unit-test release gates.
 - Preserved encrypted credentials, save-time MISP validation, the direct MISP
   client, templates, SPL command, alert action, and hardened packaging.
 

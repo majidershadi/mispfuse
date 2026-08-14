@@ -1,4 +1,4 @@
-# Fully resolved runtime dependency set for Splunk 10.0+ / Python 3.9 and 3.13.
+# Fully resolved runtime dependency set for Splunk 9.0+ / Python 3.7, 3.9, and 3.13.
 # Every requirement is exact and hash-locked. All selected wheels are
 # platform-independent (py3-none-any or py2.py3-none-any); the post-build
 # verifier rejects .so, .pyd, .dll, .dylib, and other native binaries.
@@ -13,8 +13,8 @@ defusedxml==0.7.1 \
     --hash=sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61
 deprecation==2.1.0 \
     --hash=sha256:a10811591210e1fb0e768a8c25517cabeabcba6f0bf96564f8ff45189f90b14a
-packaging==26.3 \
-    --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c
+packaging==23.2 \
+    --hash=sha256:8c491190033a9af7e1d931d0b5dacc2ef47509b34dd0de67ed209b5203fc88c7
 PySocks==1.7.1 \
     --hash=sha256:2725bd0a9925919b9b51739eea5f9e2bae91e83288108a9ad338b2e3a4435ee5
 sortedcontainers==2.4.0 \

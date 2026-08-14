@@ -1,4 +1,5 @@
-# Build and test environment. These packages are not shipped in the Splunk app.
--r requirements-test.txt
+# Build environment only. Runtime-test packages belong in separate Python
+# 3.7, 3.9, and 3.13 environments because UCC requires packaging>=25 while
+# the shipped Python 3.7-compatible dependency closure pins packaging==23.2.
 splunk-add-on-ucc-framework==6.5.3
 splunk-appinspect==4.3.0

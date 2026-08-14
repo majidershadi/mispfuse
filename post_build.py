@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import ast
 import configparser
 import json
 import os
@@ -11,7 +12,7 @@ import sys
 from collections.abc import Callable
 
 REQUIRED_VERSIONS = {"3.9", "3.13"}
-LEGACY_PYTHON_VERSION = "python3.9"
+LEGACY_PYTHON_VERSION = "python3"
 
 
 def _load(path: str) -> configparser.RawConfigParser:
@@ -31,7 +32,7 @@ def _normalize_legacy_python_version(
     select: Callable[[str], bool],
     description: str,
 ) -> list[str]:
-    """Force UCC-generated extension points to use Python 3.9 on Splunk 9.3."""
+    """Use Splunk's Python 3 alias for compatibility with Enterprise 9.0+."""
 
     if not os.path.exists(path):
         return [f"missing generated file: {path}"]
@@ -121,11 +122,11 @@ def _check(
         if legacy != LEGACY_PYTHON_VERSION:
             errors.append(
                 f"{path} [{section}] has python.version={legacy!r}; "
-                "expected python3.9 for Splunk 9.3 through 10.1 compatibility"
+                "expected python3 for Splunk 9.0 through 10.1 compatibility"
             )
         else:
             print(
-                "  verified python.version=python3.9 in "
+                "  verified python.version=python3 in "
                 f"{os.path.basename(path)} [{section}]"
             )
     return errors
@@ -239,6 +240,42 @@ def _check_no_native_binaries(out_dir: str) -> list[str]:
     return []
 
 
+def _parse_python37(source: str, filename: str):
+    """Parse with the 3.7 grammar, including on Python 3.7 itself."""
+
+    if sys.version_info >= (3, 8):
+        return ast.parse(
+            source,
+            filename=filename,
+            feature_version=(3, 7),
+        )
+    return ast.parse(source, filename=filename)
+
+
+def _check_python37_syntax(source_root: str) -> list[str]:
+    """Reject syntax that cannot be parsed by Splunk's Python 3.7 runtime."""
+
+    paths = [os.path.join(source_root, "post_build.py")]
+    bin_dir = os.path.join(source_root, "package", "bin")
+    for current, _, files in os.walk(bin_dir):
+        paths.extend(
+            os.path.join(current, filename)
+            for filename in files
+            if filename.endswith(".py")
+        )
+
+    errors: list[str] = []
+    for path in paths:
+        try:
+            with open(path, encoding="utf-8") as handle:
+                _parse_python37(handle.read(), path)
+        except (OSError, SyntaxError) as error:
+            errors.append(f"Python 3.7 syntax check failed for {path}: {error}")
+    if not errors:
+        print("  verified package source parses with the Python 3.7 grammar")
+    return errors
+
+
 def _check_locked_dependencies(source_root: str) -> list[str]:
     path = os.path.join(source_root, "package", "lib", "requirements.txt")
     if not os.path.exists(path):
@@ -277,7 +314,7 @@ def _check_locked_dependencies(source_root: str) -> list[str]:
 def _check_identity(source_root: str, out_dir: str) -> list[str]:
     expected_id = "mispfuse"
     expected_label = "MISPFuse"
-    expected_version = "2.2.2"
+    expected_version = "2.2.3"
     errors: list[str] = []
 
     app_conf = os.path.join(out_dir, "default", "app.conf")
@@ -287,7 +324,7 @@ def _check_identity(source_root: str, out_dir: str) -> list[str]:
     if parser.get("ui", "label", fallback="") != expected_label:
         errors.append("generated app.conf UI label is not MISPFuse")
     if parser.get("launcher", "version", fallback="") != expected_version:
-        errors.append("generated app.conf launcher version is not 2.2.2")
+        errors.append("generated app.conf launcher version is not 2.2.3")
     generated_build = parser.get("install", "build", fallback="").strip()
     if not generated_build.isdigit() or int(generated_build) <= 0:
         errors.append(
@@ -305,7 +342,7 @@ def _check_identity(source_root: str, out_dir: str) -> list[str]:
     if meta.get("displayName") != expected_label:
         errors.append("globalConfig displayName is not MISPFuse")
     if meta.get("version") != expected_version:
-        errors.append("globalConfig version is not 2.2.2")
+        errors.append("globalConfig version is not 2.2.3")
     if meta.get("checkForUpdates") is not True:
         errors.append("globalConfig does not enable Splunkbase update checks")
 
@@ -316,15 +353,15 @@ def _check_identity(source_root: str, out_dir: str) -> list[str]:
         manifest.get("info", {}).get("id", {}).get("version")
     )
     if manifest_version != expected_version:
-        errors.append("app.manifest version is not 2.2.2")
+        errors.append("app.manifest version is not 2.2.3")
     enterprise = (
         manifest.get("platformRequirements", {})
         .get("splunk", {})
         .get("Enterprise")
     )
-    if enterprise != ">=9.3.0":
+    if enterprise != ">=9.0.0":
         errors.append(
-            "app.manifest Splunk Enterprise requirement is not >=9.3.0"
+            "app.manifest Splunk Enterprise requirement is not >=9.0.0"
         )
 
     if not errors:
@@ -364,6 +401,7 @@ def main(out_dir: str) -> int:
     source_root = os.path.dirname(os.path.abspath(__file__))
     errors += _check_no_compiled_python(out_dir)
     errors += _check_no_native_binaries(out_dir)
+    errors += _check_python37_syntax(source_root)
     errors += _check_locked_dependencies(source_root)
     errors += _check_identity(source_root, out_dir)
 
@@ -377,8 +415,8 @@ def main(out_dir: str) -> int:
         )
         return 1
 
-    print("Release checks passed: Python 3.9/3.13 declarations, legacy "
-          "python3.9 fallback, custom validator, identity, locked dependencies, "
+    print("Release checks passed: Python 3.7/3.9/3.13 compatibility, legacy "
+          "python3 fallback, custom validator, identity, locked dependencies, "
           "no compiled Python, and no native binaries.")
     return 0
 

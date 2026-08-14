@@ -24,13 +24,15 @@ class ReleaseChecksTest(unittest.TestCase):
         test = self._read_exact_versions(ROOT / "requirements-test.txt")
         self.assertEqual(test, runtime)
 
-    def test_dev_requirements_include_test_dependencies(self):
+    def test_build_dependencies_are_separate_from_runtime_test_lock(self):
         lines = {
             line.strip()
             for line in (ROOT / "requirements-dev.txt").read_text(encoding="utf-8").splitlines()
             if line.strip() and not line.lstrip().startswith("#")
         }
-        self.assertIn("-r requirements-test.txt", lines)
+        self.assertNotIn("-r requirements-test.txt", lines)
+        self.assertIn("splunk-add-on-ucc-framework==6.5.3", lines)
+        self.assertIn("splunk-appinspect==4.3.0", lines)
 
     def test_generated_ucc_build_number_is_accepted(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -39,7 +41,7 @@ class ReleaseChecksTest(unittest.TestCase):
             build = str(int(time.time()))
             (default / "app.conf").write_text(
                 "[launcher]\n"
-                "version = 2.2.2\n"
+                "version = 2.2.3\n"
                 "\n"
                 "[install]\n"
                 f"build = {build}\n"
@@ -63,7 +65,7 @@ class ReleaseChecksTest(unittest.TestCase):
             default.mkdir()
             (default / "app.conf").write_text(
                 "[launcher]\n"
-                "version = 2.2.2\n"
+                "version = 2.2.3\n"
                 "\n"
                 "[install]\n"
                 "build = release-2200\n"
@@ -109,16 +111,16 @@ class ReleaseChecksTest(unittest.TestCase):
         )
         self.assertEqual(
             manifest["platformRequirements"]["splunk"]["Enterprise"],
-            ">=9.3.0",
+            ">=9.0.0",
         )
 
-    def test_legacy_selector_is_normalized_to_python39(self):
+    def test_legacy_selector_is_normalized_to_python3(self):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "commands.conf"
             path.write_text(
                 "[mispfusepush]\n"
                 "filename = mispfuse_command_logic.py\n"
-                "python.version = python3\n"
+                "python.version = python3.9\n"
                 "python.required = 3.9, 3.13\n",
                 encoding="utf-8",
             )
@@ -133,7 +135,7 @@ class ReleaseChecksTest(unittest.TestCase):
             parser.read(path)
             self.assertEqual(
                 parser.get("mispfusepush", "python.version"),
-                "python3.9",
+                "python3",
             )
             self.assertEqual(
                 post_build._check(
@@ -144,18 +146,17 @@ class ReleaseChecksTest(unittest.TestCase):
                 [],
             )
 
-    def test_package_source_parses_as_python39(self):
-        import ast
-
+    def test_package_source_parses_as_python37(self):
         paths = [ROOT / "post_build.py"]
         paths.extend((ROOT / "package" / "bin").rglob("*.py"))
         for path in paths:
             with self.subTest(path=path.relative_to(ROOT)):
-                ast.parse(
-                    path.read_text(encoding="utf-8"),
-                    filename=str(path),
-                    feature_version=(3, 9),
+                post_build._parse_python37(
+                    path.read_text(encoding="utf-8"), str(path)
                 )
+
+    def test_post_build_python37_syntax_gate(self):
+        self.assertEqual(post_build._check_python37_syntax(str(ROOT)), [])
 
     @staticmethod
     def _read_exact_versions(path: Path) -> dict[str, str]:

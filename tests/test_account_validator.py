@@ -4,6 +4,7 @@ import importlib.util
 import sys
 import types
 import unittest
+from contextlib import ExitStack
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
@@ -140,14 +141,14 @@ class AccountValidatorHandlerTest(unittest.TestCase):
             "misp_key": "secret",
             "verify_ssl": True,
         }
-        with (
-            patch.object(
+        with ExitStack() as stack:
+            resolve = stack.enter_context(patch.object(
                 handler_module, "resolve_account_values", return_value=resolved
-            ) as resolve,
-            patch.object(
+            ))
+            stack.enter_context(patch.object(
                 handler_module, "get_proxies", return_value={"https": "proxy"}
-            ),
-            patch.object(
+            ))
+            test_connection = stack.enter_context(patch.object(
                 handler_module,
                 "test_misp_connection",
                 return_value={
@@ -155,8 +156,7 @@ class AccountValidatorHandlerTest(unittest.TestCase):
                     "version": "2.5.12",
                     "type_count": 42,
                 },
-            ) as test_connection,
-        ):
+            ))
             result = self.handler.handleCreate({"marker": 1})
 
         self.assertEqual(result, "created")
@@ -170,8 +170,8 @@ class AccountValidatorHandlerTest(unittest.TestCase):
         )
 
     def test_failed_connection_blocks_save(self):
-        with (
-            patch.object(
+        with ExitStack() as stack:
+            stack.enter_context(patch.object(
                 handler_module,
                 "resolve_account_values",
                 return_value={
@@ -179,14 +179,15 @@ class AccountValidatorHandlerTest(unittest.TestCase):
                     "misp_key": "secret",
                     "verify_ssl": True,
                 },
-            ),
-            patch.object(handler_module, "get_proxies", return_value={}),
-            patch.object(
+            ))
+            stack.enter_context(
+                patch.object(handler_module, "get_proxies", return_value={})
+            )
+            stack.enter_context(patch.object(
                 handler_module,
                 "test_misp_connection",
                 side_effect=FakeConnectionTestError("MISP rejected the API key."),
-            ),
-        ):
+            ))
             with self.assertRaises(FakeRestError) as raised:
                 self.handler.handleCreate({})
 
@@ -201,15 +202,17 @@ class AccountValidatorHandlerTest(unittest.TestCase):
             "verify_ssl": True,
         }
         resolved = dict(existing)
-        with (
-            patch.object(
+        with ExitStack() as stack:
+            get_account = stack.enter_context(patch.object(
                 handler_module, "get_account", return_value=existing
-            ) as get_account,
-            patch.object(
+            ))
+            resolve = stack.enter_context(patch.object(
                 handler_module, "resolve_account_values", return_value=resolved
-            ) as resolve,
-            patch.object(handler_module, "get_proxies", return_value={}),
-            patch.object(
+            ))
+            stack.enter_context(
+                patch.object(handler_module, "get_proxies", return_value={})
+            )
+            stack.enter_context(patch.object(
                 handler_module,
                 "test_misp_connection",
                 return_value={
@@ -217,8 +220,7 @@ class AccountValidatorHandlerTest(unittest.TestCase):
                     "version": "2.5.12",
                     "type_count": 42,
                 },
-            ),
-        ):
+            ))
             result = self.handler.handleEdit({"marker": 2})
 
         self.assertEqual(result, "edited")

@@ -128,3 +128,16 @@ boundary. Version 2.2.2 therefore uses the complete semantic-version constraint
 This remains a truthful runtime claim: Splunk 9.3 ships Python 3.9 and accepts
 `python.version = python3.9`. MISPFuse does not lower the range to 9.0 because
 that would require supporting Python 3.7 on Splunk 9.0 through 9.2.
+
+## Stage 7: support the validator's actual Splunk 9.0 floor
+
+The validator subsequently rejected `>=9.3.0` and required a range intersecting
+Splunk Enterprise 9.0. Version 2.2.3 adds the compatibility that an honest
+`>=9.0.0` claim requires: the complete dependency lock installs on Python 3.7,
+the unit suite runs on Python 3.7 as well as 3.9 and 3.13, and the release gate
+parses every shipped Python module with the Python 3.7 grammar.
+
+Generated legacy extension points use `python.version = python3`, allowing
+Splunk 9.0 through 9.2 to select their supported Python 3 runtime. Splunk 10.2+
+continues to use `python.required = 3.9, 3.13`. `packaging` is pinned to 23.2,
+the compatible version selected for the Python 3.7 dependency closure.

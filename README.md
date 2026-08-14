@@ -20,14 +20,15 @@ Splunk or the MISP Project.
 
 ## Project evolution
 
-This repository preserves six stages of MISPFuse:
+This repository preserves seven stages of MISPFuse:
 
 - `v1.5.0-legacy`: traditional IP-only SPL prototype;
 - `v2.0.0-ucc`: UCC migration and alert-action milestone;
 - `v2.1.0`: hardened Splunk 10.2/Python 3.13 engineering milestone;
 - `v2.2.0`: Python 3.9/3.13 compatibility milestone targeting Splunk 10.0+;
 - `v2.2.1`: Splunk 9.4 range-validation milestone;
-- `v2.2.2`: current Splunkbase release using the accepted full-semver 9.3 range.
+- `v2.2.2`: Splunk 9.3 range-validation milestone;
+- `v2.2.3`: current release with genuine Splunk 9.0+/Python 3.7 compatibility.
 
 See [Engineering evolution](docs/EVOLUTION.md) and the
 [feature matrix](docs/FEATURE_MATRIX.md).
@@ -36,8 +37,8 @@ See [Engineering evolution](docs/EVOLUTION.md) and the
 
 | Component | Supported version |
 |---|---|
-| Splunk Enterprise | 9.3 or later |
-| Splunk Python runtime | 3.9 or 3.13 |
+| Splunk Enterprise | 9.0.0 or later |
+| Splunk Python runtime | 3.7, 3.9, or 3.13 |
 | MISP | 2.5.x |
 | UCC framework, build only | 6.5.3 |
 
@@ -46,7 +47,7 @@ Splunk Cloud vetting for this exact package.
 
 ## Install and configure
 
-1. Install `mispfuse-2.2.2.tar.gz` from **Apps > Manage Apps > Install app from
+1. Install `mispfuse-2.2.3.tar.gz` from **Apps > Manage Apps > Install app from
    file**.
 2. Restart Splunk.
 3. Open **MISPFuse > Configuration**.
@@ -269,13 +270,16 @@ Any option left unset inherits from the selected template.
 ## Build from source
 
 Use Python 3.13 for the UCC/AppInspect build environment and run the unit suite
-under both Python 3.9 and Python 3.13 before packaging.
+under Python 3.7, Python 3.9, and Python 3.13 before packaging.
 
 ```bash
 python3.13 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements-dev.txt
+# In separate Python 3.7, 3.9, and 3.13 environments:
+python -m pip install -r requirements-test.txt
+make test-python37
 make test-python39
 make test-python313
 make package
@@ -287,9 +291,13 @@ For the full release gate, including AppInspect:
 make release
 ```
 
-`requirements-dev.txt` includes `requirements-test.txt`, which mirrors the exact runtime dependency versions needed by the unit tests. If the virtual environment was created from an earlier source archive, rerun the install command before `make test`.
+`requirements-dev.txt` contains only UCC and AppInspect. Install
+`requirements-test.txt` separately in each test interpreter; it mirrors the
+exact shipped runtime dependency versions. Build and test dependencies are
+kept apart because UCC 6.5.3 requires a newer `packaging` release than the
+Python 3.7-compatible runtime lock.
 
-The package is written to `mispfuse-2.2.2.tar.gz`.
+The package is written to `mispfuse-2.2.3.tar.gz`.
 
 ## Project layout
 
@@ -310,9 +318,10 @@ tests/                               unit tests
 
 **The Configuration page reports a Python type error**
 
-Confirm that Splunk Enterprise is 9.3 or later. Generated `commands.conf`,
+Confirm that Splunk Enterprise is 9.0.0 or later. Generated `commands.conf`,
 `alert_actions.conf`, and `restmap.conf` must contain both
-`python.version = python3.9` and `python.required = 3.9, 3.13`.
+`python.version = python3` and `python.required = 3.9, 3.13`. Splunk 9.0-9.2
+use the legacy selector with Python 3.7; newer releases select 3.9 or 3.13.
 
 **The account cannot be saved**
 

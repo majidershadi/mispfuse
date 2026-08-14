@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.2.3 — Splunk 9.0 and Python 3.7 compatibility
+
+### Changed
+
+- Lowered the Splunk Enterprise constraint from `>=9.3.0` to the validator's
+  accepted full semantic-version boundary, `>=9.0.0`.
+- Restored `python.version = python3` for extension points used by Splunk
+  9.0 through 10.1 while retaining `python.required = 3.9, 3.13` for Splunk
+  10.2 and later.
+- Replaced `packaging` 26.3 with hash-locked `packaging` 23.2 so the complete
+  runtime dependency closure supports Python 3.7, 3.9, and 3.13.
+
+### Added
+
+- Python 3.7 unit-test and source-grammar release gates alongside the existing
+  Python 3.9 and Python 3.13 gates.
+
+### Fixed
+
+- Splunkbase SLIM rejection of v2.2.2 because `>=9.3.0` did not intersect the
+  Enterprise versions recognized by the online validator.
+
 ## 2.2.2 — SLIM-supported 9.3 range
 
 ### Changed
