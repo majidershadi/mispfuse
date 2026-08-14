@@ -2,7 +2,7 @@
     "meta": {
         "name": "mispfuse",
         "restRoot": "mispfuse",
-        "version": "2.2.3",
+        "version": "2.2.4",
         "displayName": "MISPFuse",
         "schemaVersion": "0.0.10",
         "checkForUpdates": true,

@@ -1,8 +1,8 @@
-MISPFuse 2.2.3
+MISPFuse 2.2.4
 
-- Uses the full semantic-version constraint >=9.0.0 required by the online
-  Splunkbase SLIM matrix.
-- Restores python.version=python3 for Splunk 9.0 through 10.1 and tests the
+- Uses the full semantic-version constraint >=8.0.0, which intersects the
+  Splunk Packaging Toolkit 1.2.8 Enterprise catalog at version 8.0.0.
+- Uses python.version=python3 for Splunk 8.0 through 10.1 and tests the
   packaged code and complete dependency closure on Python 3.7.
 - Retains python.required=3.9,3.13 on Splunk 10.2 and later, where the platform
   selects Python 3.13 when available and otherwise uses Python 3.9.

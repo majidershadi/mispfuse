@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.2.4 — SLIM catalog compatibility correction
+
+### Changed
+
+- Lowered the Splunk Enterprise constraint from `>=9.0.0` to `>=8.0.0`.
+  Unlike the successive AI-generated recommendations, this boundary is
+  directly verified against Splunk Packaging Toolkit 1.2.8, whose bundled
+  Enterprise catalog contains 8.0.0.
+- Extended the documented compatibility claim to Splunk Enterprise 8.x, which
+  provides Python 3.7 and supports the existing `python.version = python3`
+  extension-point selector.
+
+### Fixed
+
+- Splunkbase SLIM rejection of v2.2.3 because `>=9.0.0` still did not
+  intersect the SSAI validator's recognized Enterprise versions.
+- Avoided the report's proposed `>=8.1.0` floor because it does not intersect
+  standalone SLIM 1.2.8's bundled Enterprise catalog.
+
 ## 2.2.3 — Splunk 9.0 and Python 3.7 compatibility
 
 ### Changed

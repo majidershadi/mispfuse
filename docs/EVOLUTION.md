@@ -141,3 +141,15 @@ Generated legacy extension points use `python.version = python3`, allowing
 Splunk 9.0 through 9.2 to select their supported Python 3 runtime. Splunk 10.2+
 continues to use `python.required = 3.9, 3.13`. `packaging` is pinned to 23.2,
 the compatible version selected for the Python 3.7 dependency closure.
+
+## Stage 8: use a boundary present in the actual SLIM catalog
+
+Splunkbase then rejected `>=9.0.0`. Its generated recommendation proposed
+`>=8.1.0`, but standalone Splunk Packaging Toolkit 1.2.8 contains 8.0.0—not
+8.1.0—in its bundled Enterprise release catalog. Version 2.2.4 therefore uses
+`>=8.0.0`, a constraint that directly intersects that catalog and also includes
+any supported 8.1-or-newer release used by the online service.
+
+This remains a truthful runtime claim. Splunk Enterprise 8.x supports Python
+3.7 and the per-extension `python.version = python3` selector, while MISPFuse's
+complete dependency closure and unit suite are tested on Python 3.7.

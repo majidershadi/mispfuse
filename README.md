@@ -28,7 +28,8 @@ This repository preserves seven stages of MISPFuse:
 - `v2.2.0`: Python 3.9/3.13 compatibility milestone targeting Splunk 10.0+;
 - `v2.2.1`: Splunk 9.4 range-validation milestone;
 - `v2.2.2`: Splunk 9.3 range-validation milestone;
-- `v2.2.3`: current release with genuine Splunk 9.0+/Python 3.7 compatibility.
+- `v2.2.3`: Splunk 9.0 range-validation milestone;
+- `v2.2.4`: current release with SLIM-catalog Splunk 8.0+/Python 3.7 compatibility.
 
 See [Engineering evolution](docs/EVOLUTION.md) and the
 [feature matrix](docs/FEATURE_MATRIX.md).
@@ -37,7 +38,7 @@ See [Engineering evolution](docs/EVOLUTION.md) and the
 
 | Component | Supported version |
 |---|---|
-| Splunk Enterprise | 9.0.0 or later |
+| Splunk Enterprise | 8.0.0 or later |
 | Splunk Python runtime | 3.7, 3.9, or 3.13 |
 | MISP | 2.5.x |
 | UCC framework, build only | 6.5.3 |
@@ -47,7 +48,7 @@ Splunk Cloud vetting for this exact package.
 
 ## Install and configure
 
-1. Install `mispfuse-2.2.3.tar.gz` from **Apps > Manage Apps > Install app from
+1. Install `mispfuse-2.2.4.tar.gz` from **Apps > Manage Apps > Install app from
    file**.
 2. Restart Splunk.
 3. Open **MISPFuse > Configuration**.
@@ -297,7 +298,7 @@ exact shipped runtime dependency versions. Build and test dependencies are
 kept apart because UCC 6.5.3 requires a newer `packaging` release than the
 Python 3.7-compatible runtime lock.
 
-The package is written to `mispfuse-2.2.3.tar.gz`.
+The package is written to `mispfuse-2.2.4.tar.gz`.
 
 ## Project layout
 
@@ -318,10 +319,10 @@ tests/                               unit tests
 
 **The Configuration page reports a Python type error**
 
-Confirm that Splunk Enterprise is 9.0.0 or later. Generated `commands.conf`,
+Confirm that Splunk Enterprise is 8.0.0 or later. Generated `commands.conf`,
 `alert_actions.conf`, and `restmap.conf` must contain both
-`python.version = python3` and `python.required = 3.9, 3.13`. Splunk 9.0-9.2
-use the legacy selector with Python 3.7; newer releases select 3.9 or 3.13.
+`python.version = python3` and `python.required = 3.9, 3.13`. Splunk 8.x through
+9.2 use the legacy selector with Python 3.7; newer releases select 3.9 or 3.13.
 
 **The account cannot be saved**
 

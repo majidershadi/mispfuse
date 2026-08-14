@@ -1,6 +1,6 @@
 # Build with Python 3.13; the release gate tests all supported runtimes.
 TA      := mispfuse
-VERSION := 2.2.3
+VERSION := 2.2.4
 OUT     := output/$(TA)
 PYTHON  ?= python3
 PYTHON37 ?= python3.7

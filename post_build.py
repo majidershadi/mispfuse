@@ -32,7 +32,7 @@ def _normalize_legacy_python_version(
     select: Callable[[str], bool],
     description: str,
 ) -> list[str]:
-    """Use Splunk's Python 3 alias for compatibility with Enterprise 9.0+."""
+    """Use Splunk's Python 3 alias for compatibility with Enterprise 8.0+."""
 
     if not os.path.exists(path):
         return [f"missing generated file: {path}"]
@@ -122,7 +122,7 @@ def _check(
         if legacy != LEGACY_PYTHON_VERSION:
             errors.append(
                 f"{path} [{section}] has python.version={legacy!r}; "
-                "expected python3 for Splunk 9.0 through 10.1 compatibility"
+                "expected python3 for Splunk 8.0 through 10.1 compatibility"
             )
         else:
             print(
@@ -314,7 +314,7 @@ def _check_locked_dependencies(source_root: str) -> list[str]:
 def _check_identity(source_root: str, out_dir: str) -> list[str]:
     expected_id = "mispfuse"
     expected_label = "MISPFuse"
-    expected_version = "2.2.3"
+    expected_version = "2.2.4"
     errors: list[str] = []
 
     app_conf = os.path.join(out_dir, "default", "app.conf")
@@ -324,7 +324,7 @@ def _check_identity(source_root: str, out_dir: str) -> list[str]:
     if parser.get("ui", "label", fallback="") != expected_label:
         errors.append("generated app.conf UI label is not MISPFuse")
     if parser.get("launcher", "version", fallback="") != expected_version:
-        errors.append("generated app.conf launcher version is not 2.2.3")
+        errors.append("generated app.conf launcher version is not 2.2.4")
     generated_build = parser.get("install", "build", fallback="").strip()
     if not generated_build.isdigit() or int(generated_build) <= 0:
         errors.append(
@@ -342,7 +342,7 @@ def _check_identity(source_root: str, out_dir: str) -> list[str]:
     if meta.get("displayName") != expected_label:
         errors.append("globalConfig displayName is not MISPFuse")
     if meta.get("version") != expected_version:
-        errors.append("globalConfig version is not 2.2.3")
+        errors.append("globalConfig version is not 2.2.4")
     if meta.get("checkForUpdates") is not True:
         errors.append("globalConfig does not enable Splunkbase update checks")
 
@@ -353,15 +353,15 @@ def _check_identity(source_root: str, out_dir: str) -> list[str]:
         manifest.get("info", {}).get("id", {}).get("version")
     )
     if manifest_version != expected_version:
-        errors.append("app.manifest version is not 2.2.3")
+        errors.append("app.manifest version is not 2.2.4")
     enterprise = (
         manifest.get("platformRequirements", {})
         .get("splunk", {})
         .get("Enterprise")
     )
-    if enterprise != ">=9.0.0":
+    if enterprise != ">=8.0.0":
         errors.append(
-            "app.manifest Splunk Enterprise requirement is not >=9.0.0"
+            "app.manifest Splunk Enterprise requirement is not >=8.0.0"
         )
 
     if not errors:

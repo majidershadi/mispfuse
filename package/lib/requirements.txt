@@ -1,4 +1,4 @@
-# Fully resolved runtime dependency set for Splunk 9.0+ / Python 3.7, 3.9, and 3.13.
+# Fully resolved runtime dependency set for Splunk 8.0+ / Python 3.7, 3.9, and 3.13.
 # Every requirement is exact and hash-locked. All selected wheels are
 # platform-independent (py3-none-any or py2.py3-none-any); the post-build
 # verifier rejects .so, .pyd, .dll, .dylib, and other native binaries.
