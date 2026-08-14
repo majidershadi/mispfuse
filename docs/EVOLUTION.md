@@ -103,3 +103,17 @@ pre-3.0 Splunk SDK, tests the application on Python 3.9 and 3.13, keeps the
 legacy `python.version = python3` selector for Splunk 10.0/10.1, and declares
 `python.required = 3.9, 3.13` for Splunk 10.2+. Only after those changes does
 the manifest move to Splunk Enterprise 10.0 or later.
+
+## Stage 5: intersect the Splunkbase 9.x validation matrix
+
+Splunkbase subsequently rejected the 2.2.0 range because it still did not
+include an accepted Splunk 9.x release. Version 2.2.1 moves the minimum to
+Splunk Enterprise 9.4, the newest 9.x boundary and a platform that ships Python
+3.9.
+
+The manifest change is paired with a runtime correction. On Splunk 9.4,
+`python.version = python3` selects Python 3.7, so 2.2.1 explicitly generates
+`python.version = python3.9` for the command, alert action, and REST handlers.
+Splunk 10.2+ continues to prefer `python.required = 3.9, 3.13`. The application
+therefore keeps the same tested Python 3.9/3.13 code and dependency boundary
+while truthfully intersecting the validator's 9.x matrix.

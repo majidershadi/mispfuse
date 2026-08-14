@@ -11,7 +11,7 @@ import sys
 from collections.abc import Callable
 
 REQUIRED_VERSIONS = {"3.9", "3.13"}
-LEGACY_PYTHON_VERSION = "python3"
+LEGACY_PYTHON_VERSION = "python3.9"
 
 
 def _load(path: str) -> configparser.RawConfigParser:
@@ -24,6 +24,70 @@ def _load(path: str) -> configparser.RawConfigParser:
 
 def _versions(value: str) -> set[str]:
     return {item.strip() for item in value.split(",") if item.strip()}
+
+
+def _normalize_legacy_python_version(
+    path: str,
+    select: Callable[[str], bool],
+    description: str,
+) -> list[str]:
+    """Force UCC-generated extension points to use Python 3.9 on Splunk 9.4."""
+
+    if not os.path.exists(path):
+        return [f"missing generated file: {path}"]
+
+    with open(path, encoding="utf-8", newline="") as handle:
+        lines = handle.readlines()
+
+    selected_sections: set[str] = set()
+    version_sections: set[str] = set()
+    current_section = ""
+    changed = 0
+
+    for index, line in enumerate(lines):
+        section_match = re.match(r"^\s*\[([^]]+)]\s*(?:\r?\n)?$", line)
+        if section_match:
+            current_section = section_match.group(1)
+            if select(current_section):
+                selected_sections.add(current_section)
+            continue
+
+        if not current_section or not select(current_section):
+            continue
+
+        version_match = re.match(
+            r"^(\s*python\.version\s*=\s*)([^\r\n]*)(\r?\n)?$",
+            line,
+        )
+        if not version_match:
+            continue
+
+        version_sections.add(current_section)
+        newline = version_match.group(3) or ""
+        if version_match.group(2).strip() != LEGACY_PYTHON_VERSION:
+            lines[index] = (
+                version_match.group(1) + LEGACY_PYTHON_VERSION + newline
+            )
+            changed += 1
+
+    if not selected_sections:
+        return [f"no {description} stanza found in {path}"]
+
+    missing = sorted(selected_sections - version_sections)
+    if missing:
+        return [
+            f"{path} [{section}] has no python.version setting"
+            for section in missing
+        ]
+
+    if changed:
+        with open(path, "w", encoding="utf-8", newline="") as handle:
+            handle.writelines(lines)
+        print(
+            f"  normalized {changed} python.version selector(s) to "
+            f"{LEGACY_PYTHON_VERSION} in {os.path.basename(path)}"
+        )
+    return []
 
 
 def _check(
@@ -57,11 +121,11 @@ def _check(
         if legacy != LEGACY_PYTHON_VERSION:
             errors.append(
                 f"{path} [{section}] has python.version={legacy!r}; "
-                "expected python3 for Splunk 10.0/10.1 compatibility"
+                "expected python3.9 for Splunk 9.4 through 10.1 compatibility"
             )
         else:
             print(
-                "  verified python.version=python3 in "
+                "  verified python.version=python3.9 in "
                 f"{os.path.basename(path)} [{section}]"
             )
     return errors
@@ -213,7 +277,7 @@ def _check_locked_dependencies(source_root: str) -> list[str]:
 def _check_identity(source_root: str, out_dir: str) -> list[str]:
     expected_id = "mispfuse"
     expected_label = "MISPFuse"
-    expected_version = "2.2.0"
+    expected_version = "2.2.1"
     errors: list[str] = []
 
     app_conf = os.path.join(out_dir, "default", "app.conf")
@@ -223,7 +287,7 @@ def _check_identity(source_root: str, out_dir: str) -> list[str]:
     if parser.get("ui", "label", fallback="") != expected_label:
         errors.append("generated app.conf UI label is not MISPFuse")
     if parser.get("launcher", "version", fallback="") != expected_version:
-        errors.append("generated app.conf launcher version is not 2.2.0")
+        errors.append("generated app.conf launcher version is not 2.2.1")
     generated_build = parser.get("install", "build", fallback="").strip()
     if not generated_build.isdigit() or int(generated_build) <= 0:
         errors.append(
@@ -241,7 +305,7 @@ def _check_identity(source_root: str, out_dir: str) -> list[str]:
     if meta.get("displayName") != expected_label:
         errors.append("globalConfig displayName is not MISPFuse")
     if meta.get("version") != expected_version:
-        errors.append("globalConfig version is not 2.2.0")
+        errors.append("globalConfig version is not 2.2.1")
     if meta.get("checkForUpdates") is not True:
         errors.append("globalConfig does not enable Splunkbase update checks")
 
@@ -252,14 +316,14 @@ def _check_identity(source_root: str, out_dir: str) -> list[str]:
         manifest.get("info", {}).get("id", {}).get("version")
     )
     if manifest_version != expected_version:
-        errors.append("app.manifest version is not 2.2.0")
+        errors.append("app.manifest version is not 2.2.1")
     enterprise = (
         manifest.get("platformRequirements", {})
         .get("splunk", {})
         .get("Enterprise")
     )
-    if enterprise != ">=10.0":
-        errors.append("app.manifest Splunk Enterprise requirement is not >=10.0")
+    if enterprise != ">=9.4":
+        errors.append("app.manifest Splunk Enterprise requirement is not >=9.4")
 
     if not errors:
         print(
@@ -273,21 +337,27 @@ def main(out_dir: str) -> int:
     print(f"Verifying generated Python runtime declarations in {default_dir}")
 
     errors: list[str] = []
-    errors += _check(
-        os.path.join(default_dir, "commands.conf"),
-        lambda section: section == "mispfusepush",
-        "MISPFuse command",
-    )
-    errors += _check(
-        os.path.join(default_dir, "alert_actions.conf"),
-        lambda section: section == "mispfuse_push",
-        "MISPFuse alert action",
-    )
-    errors += _check(
-        os.path.join(default_dir, "restmap.conf"),
-        lambda section: section.startswith(("admin_external:", "script:")),
-        "Python REST handler",
-    )
+    runtime_targets = [
+        (
+            os.path.join(default_dir, "commands.conf"),
+            lambda section: section == "mispfusepush",
+            "MISPFuse command",
+        ),
+        (
+            os.path.join(default_dir, "alert_actions.conf"),
+            lambda section: section == "mispfuse_push",
+            "MISPFuse alert action",
+        ),
+        (
+            os.path.join(default_dir, "restmap.conf"),
+            lambda section: section.startswith(("admin_external:", "script:")),
+            "Python REST handler",
+        ),
+    ]
+    for path, select, description in runtime_targets:
+        errors += _normalize_legacy_python_version(path, select, description)
+    for path, select, description in runtime_targets:
+        errors += _check(path, select, description)
     errors += _check_custom_account_handler(out_dir)
     source_root = os.path.dirname(os.path.abspath(__file__))
     errors += _check_no_compiled_python(out_dir)
@@ -306,7 +376,7 @@ def main(out_dir: str) -> int:
         return 1
 
     print("Release checks passed: Python 3.9/3.13 declarations, legacy "
-          "python3 fallback, custom validator, identity, locked dependencies, "
+          "python3.9 fallback, custom validator, identity, locked dependencies, "
           "no compiled Python, and no native binaries.")
     return 0
 

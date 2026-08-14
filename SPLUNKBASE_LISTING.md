@@ -5,7 +5,7 @@
 - Type: App
 - Title: MISPFuse
 - Package ID: `mispfuse`
-- Version: 2.2.0
+- Version: 2.2.1
 - License: Apache-2.0
 - Suggested category: Threat Intelligence, or Security, Fraud & Compliance
 
@@ -50,15 +50,13 @@ endorsed by Splunk or the MISP Project.
 
 ## Release notes
 
-- Fixed the Splunkbase SLIM version-range failure without making an unsupported
-  manifest-only compatibility claim.
-- Added Python 3.9 and 3.13 runtime support.
-- Added the legacy Python selector required by Splunk 10.0 and 10.1 while
-  retaining the modern selector used by Splunk 10.2 and later.
-- Replaced Python-3.13-only Splunk SDK 3.0.0 with compatible SDK 2.1.1.
-- Updated the local AppInspect release gate to 4.3.0.
-- Added dual-runtime, Python 3.9 syntax, identity, dependency, bytecode, and
-  native-binary release checks.
+- Expanded compatibility to Splunk Enterprise 9.4 or later after Splunkbase
+  required the manifest range to include an accepted 9.x release.
+- Added the explicit `python.version = python3.9` selector required to avoid
+  the `python3` alias selecting Python 3.7 on Splunk 9.4.
+- Retained Python 3.9 and 3.13 declarations for Splunk 10.2 and later.
+- Added generated-config regression checks for commands, alert actions, and
+  REST handlers.
 - Preserved encrypted credentials, save-time MISP validation, the direct MISP
   client, templates, SPL command, alert action, and hardened packaging.
 

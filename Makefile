@@ -1,6 +1,6 @@
 # Build with Python 3.9 or 3.13; the release gate runs on both runtimes.
 TA      := mispfuse
-VERSION := 2.2.0
+VERSION := 2.2.1
 OUT     := output/$(TA)
 PYTHON  ?= python3
 PYTHON39 ?= python3.9

@@ -39,7 +39,7 @@ class ReleaseChecksTest(unittest.TestCase):
             build = str(int(time.time()))
             (default / "app.conf").write_text(
                 "[launcher]\n"
-                "version = 2.2.0\n"
+                "version = 2.2.1\n"
                 "\n"
                 "[install]\n"
                 f"build = {build}\n"
@@ -63,7 +63,7 @@ class ReleaseChecksTest(unittest.TestCase):
             default.mkdir()
             (default / "app.conf").write_text(
                 "[launcher]\n"
-                "version = 2.2.0\n"
+                "version = 2.2.1\n"
                 "\n"
                 "[install]\n"
                 "build = release-2200\n"
@@ -101,7 +101,7 @@ class ReleaseChecksTest(unittest.TestCase):
         config = json.loads((ROOT / "globalConfig.json").read_text(encoding="utf-8"))
         self.assertEqual(config["meta"]["supportedPythonVersion"], ["3.9", "3.13"])
 
-    def test_manifest_targets_smallest_valid_splunk_range(self):
+    def test_manifest_targets_supported_splunk_9x_range(self):
         import json
 
         manifest = json.loads(
@@ -109,8 +109,40 @@ class ReleaseChecksTest(unittest.TestCase):
         )
         self.assertEqual(
             manifest["platformRequirements"]["splunk"]["Enterprise"],
-            ">=10.0",
+            ">=9.4",
         )
+
+    def test_legacy_selector_is_normalized_to_python39(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "commands.conf"
+            path.write_text(
+                "[mispfusepush]\n"
+                "filename = mispfuse_command_logic.py\n"
+                "python.version = python3\n"
+                "python.required = 3.9, 3.13\n",
+                encoding="utf-8",
+            )
+            errors = post_build._normalize_legacy_python_version(
+                str(path),
+                lambda section: section == "mispfusepush",
+                "MISPFuse command",
+            )
+            self.assertEqual(errors, [])
+
+            parser = configparser.RawConfigParser(interpolation=None)
+            parser.read(path)
+            self.assertEqual(
+                parser.get("mispfusepush", "python.version"),
+                "python3.9",
+            )
+            self.assertEqual(
+                post_build._check(
+                    str(path),
+                    lambda section: section == "mispfusepush",
+                    "MISPFuse command",
+                ),
+                [],
+            )
 
     def test_package_source_parses_as_python39(self):
         import ast

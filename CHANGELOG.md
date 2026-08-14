@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.2.1 — Splunk 9.x compatibility correction
+
+### Changed
+
+- Expanded the declared Splunk Enterprise range from 10.0+ to 9.4+ after the
+  Splunkbase SLIM matrix required an intersection with a supported 9.x release.
+- Changed the legacy runtime selector from `python.version = python3` to
+  `python.version = python3.9` for commands, alert actions, and REST handlers.
+  On Splunk 9.4, the `python3` alias selects Python 3.7; the explicit selector
+  is required for MISPFuse's tested Python 3.9 dependency boundary.
+- Retained `python.required = 3.9, 3.13` for Splunk 10.2 and later.
+
+### Added
+
+- A post-build normalization and regression test that verifies every generated
+  Python extension point uses the explicit Python 3.9 legacy selector.
+
+### Fixed
+
+- Splunkbase rejection of v2.2.0 because its `>=10.0` manifest range did not
+  include a Splunk Enterprise 9.x version accepted by the validator.
+
 ## 2.2.0 — Backward-compatible Splunkbase release
 
 ### Changed
