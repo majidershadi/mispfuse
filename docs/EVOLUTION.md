@@ -117,3 +117,14 @@ The manifest change is paired with a runtime correction. On Splunk 9.4,
 Splunk 10.2+ continues to prefer `python.required = 3.9, 3.13`. The application
 therefore keeps the same tested Python 3.9/3.13 code and dependency boundary
 while truthfully intersecting the validator's 9.x matrix.
+
+## Stage 6: use the version boundary actually accepted by SLIM
+
+The online validator then reported that Splunk 9.4 was not present in its
+supported-version list and explicitly identified 9.3.0 as an acceptable
+boundary. Version 2.2.2 therefore uses the complete semantic-version constraint
+`>=9.3.0`.
+
+This remains a truthful runtime claim: Splunk 9.3 ships Python 3.9 and accepts
+`python.version = python3.9`. MISPFuse does not lower the range to 9.0 because
+that would require supporting Python 3.7 on Splunk 9.0 through 9.2.

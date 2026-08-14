@@ -146,7 +146,7 @@ class MispClient:
             'Content-Type': 'application/json',
             # Limit response size before decoding JSON.
             'Accept-Encoding': 'identity',
-            'User-Agent': 'MISPFuse/2.2.1',
+            'User-Agent': 'MISPFuse/2.2.2',
         }
 
         response = None

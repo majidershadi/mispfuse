@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.2.2 — SLIM-supported 9.3 range
+
+### Changed
+
+- Changed the Splunk Enterprise constraint from `>=9.4` to the full semantic
+  version `>=9.3.0`, matching the version boundary identified by Splunkbase's
+  online SLIM validator.
+- Retained `python.version = python3.9` for Splunk 9.3 through 10.1 and
+  `python.required = 3.9, 3.13` for Splunk 10.2 and later.
+
+### Fixed
+
+- Splunkbase rejection of v2.2.1 because the online validator did not include
+  Splunk 9.4 in its supported-version matrix.
+- Ambiguous major/minor-only manifest formatting by using a complete semantic
+  version with major, minor, and patch components.
+
 ## 2.2.1 — Splunk 9.x compatibility correction
 
 ### Changed

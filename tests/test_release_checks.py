@@ -39,7 +39,7 @@ class ReleaseChecksTest(unittest.TestCase):
             build = str(int(time.time()))
             (default / "app.conf").write_text(
                 "[launcher]\n"
-                "version = 2.2.1\n"
+                "version = 2.2.2\n"
                 "\n"
                 "[install]\n"
                 f"build = {build}\n"
@@ -63,7 +63,7 @@ class ReleaseChecksTest(unittest.TestCase):
             default.mkdir()
             (default / "app.conf").write_text(
                 "[launcher]\n"
-                "version = 2.2.1\n"
+                "version = 2.2.2\n"
                 "\n"
                 "[install]\n"
                 "build = release-2200\n"
@@ -109,7 +109,7 @@ class ReleaseChecksTest(unittest.TestCase):
         )
         self.assertEqual(
             manifest["platformRequirements"]["splunk"]["Enterprise"],
-            ">=9.4",
+            ">=9.3.0",
         )
 
     def test_legacy_selector_is_normalized_to_python39(self):

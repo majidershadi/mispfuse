@@ -20,13 +20,14 @@ Splunk or the MISP Project.
 
 ## Project evolution
 
-This repository preserves five stages of MISPFuse:
+This repository preserves six stages of MISPFuse:
 
 - `v1.5.0-legacy`: traditional IP-only SPL prototype;
 - `v2.0.0-ucc`: UCC migration and alert-action milestone;
 - `v2.1.0`: hardened Splunk 10.2/Python 3.13 engineering milestone;
 - `v2.2.0`: Python 3.9/3.13 compatibility milestone targeting Splunk 10.0+;
-- `v2.2.1`: current Splunkbase release targeting the accepted Splunk 9.x range.
+- `v2.2.1`: Splunk 9.4 range-validation milestone;
+- `v2.2.2`: current Splunkbase release using the accepted full-semver 9.3 range.
 
 See [Engineering evolution](docs/EVOLUTION.md) and the
 [feature matrix](docs/FEATURE_MATRIX.md).
@@ -35,7 +36,7 @@ See [Engineering evolution](docs/EVOLUTION.md) and the
 
 | Component | Supported version |
 |---|---|
-| Splunk Enterprise | 9.4 or later |
+| Splunk Enterprise | 9.3 or later |
 | Splunk Python runtime | 3.9 or 3.13 |
 | MISP | 2.5.x |
 | UCC framework, build only | 6.5.3 |
@@ -45,7 +46,7 @@ Splunk Cloud vetting for this exact package.
 
 ## Install and configure
 
-1. Install `mispfuse-2.2.1.tar.gz` from **Apps > Manage Apps > Install app from
+1. Install `mispfuse-2.2.2.tar.gz` from **Apps > Manage Apps > Install app from
    file**.
 2. Restart Splunk.
 3. Open **MISPFuse > Configuration**.
@@ -288,7 +289,7 @@ make release
 
 `requirements-dev.txt` includes `requirements-test.txt`, which mirrors the exact runtime dependency versions needed by the unit tests. If the virtual environment was created from an earlier source archive, rerun the install command before `make test`.
 
-The package is written to `mispfuse-2.2.1.tar.gz`.
+The package is written to `mispfuse-2.2.2.tar.gz`.
 
 ## Project layout
 
@@ -309,7 +310,7 @@ tests/                               unit tests
 
 **The Configuration page reports a Python type error**
 
-Confirm that Splunk Enterprise is 9.4 or later. Generated `commands.conf`,
+Confirm that Splunk Enterprise is 9.3 or later. Generated `commands.conf`,
 `alert_actions.conf`, and `restmap.conf` must contain both
 `python.version = python3.9` and `python.required = 3.9, 3.13`.
 

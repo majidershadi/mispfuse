@@ -1,12 +1,11 @@
-MISPFuse 2.2.1
+MISPFuse 2.2.2
 
-- Expands the supported Splunk Enterprise range to 9.4 or later after the
-  Splunkbase SLIM matrix rejected packages that did not intersect Splunk 9.x.
-- Uses python.version=python3.9 for Splunk 9.4 through 10.1. This avoids the
-  python3 alias selecting Python 3.7 on Splunk 9.4.
+- Uses the full semantic-version constraint >=9.3.0 accepted by the online
+  Splunkbase SLIM matrix.
+- Keeps python.version=python3.9 for Splunk 9.3 through 10.1; Splunk 9.3 ships
+  and supports the Python 3.9 interpreter.
 - Retains python.required=3.9,3.13 on Splunk 10.2 and later, where the platform
   selects Python 3.13 when available and otherwise uses Python 3.9.
-- Keeps the exact, hash-locked, pure-Python dependency closure and Splunk SDK
-  for Python 2.1.1 introduced in 2.2.0.
-- Adds a release regression check that rewrites and verifies every generated
-  command, alert-action, and REST-handler legacy selector.
+- Does not claim compatibility with Splunk 9.0 through 9.2 or Python 3.7.
+- Preserves the exact, hash-locked, pure-Python dependency closure, encrypted
+  credentials, templates, SPL command, alert action, and MISP validation.
